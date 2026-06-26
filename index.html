@@ -66,6 +66,7 @@ const GAME_HEIGHT = isMobile ? 844 : 865;
 const minX = isMobile ? 40 : 80;
 const maxX = isMobile ? GAME_WIDTH - 40 : 1590;
 const bottomY = isMobile ? GAME_HEIGHT + 60 : 900;
+const maxItemSpeed = isMobile ? 7 : 8;
 
 const config = {
   type: Phaser.AUTO,
@@ -99,6 +100,7 @@ function preload() {
 function create() {
     const cardScreen = document.getElementById("card-screen");
     const gameScreen = document.getElementById("game-screen");
+    
 
     gameScreen.style.display = "flex";
 
@@ -115,19 +117,22 @@ function create() {
   this.lives = 3;
   this.nextSpeedIncrease = 5;
 
-  this.background = this.add.image(
-        GAME_WIDTH / 2,
-        GAME_HEIGHT / 2,
-        'background'
-    );
+    this.background = this.add.image(
+    isMobile ? GAME_WIDTH * 0.58 : GAME_WIDTH / 2,
+    GAME_HEIGHT / 2,
+    'background'
+  );
 
-      if (isMobile) {
-        this.background.setScale(
-          Math.max(
-            GAME_WIDTH / this.background.width,
-            GAME_HEIGHT / this.background.height
-          )
-        );
+    if (isMobile) {
+      this.background.setScale(
+        Math.max(
+          GAME_WIDTH / this.background.width,
+          GAME_HEIGHT / this.background.height
+        )
+      );
+
+      // Move image slightly right so the visible crop shows more left + middle
+      this.background.x = GAME_WIDTH * 0.62;
     } else {
       this.background.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
     }
@@ -210,41 +215,46 @@ function update() {
     this.player.x += this.playerSpeed;
     }
 
-  if (this.score >= this.nextSpeedIncrease) {
-    this.itemSpeed += 0.25;
-    this.nextSpeedIncrease += 5;
+    if (this.score >= this.nextSpeedIncrease) {
+      this.itemSpeed = Math.min(this.itemSpeed + 0.25, maxItemSpeed);
+      this.nextSpeedIncrease += 5;
     }
 
-  this.items.forEach(item => {
-    item.y += this.itemSpeed + item.speedOffset;
+    this.items.forEach(item => {
+      item.y += this.itemSpeed + item.speedOffset;
 
-    if (item.y > bottomY) {
-      this.lives--;
+      if (item.y > bottomY) {
+        this.lives--;
 
-      if (this.lives === 2) this.livesText.setText("Lives: ❤️❤️");
-      if (this.lives === 1) this.livesText.setText("Lives: ❤️");
+        if (this.lives === 2) this.livesText.setText("Lives: ❤️❤️");
+        if (this.lives === 1) this.livesText.setText("Lives: ❤️");
 
-      if (this.lives === 0) {
-        showGameOver.call(this);
-        return;
+        if (this.lives === 0) {
+          showGameOver.call(this);
+          return;
+        }
+
+        item.y = Phaser.Math.Between(-300, -50);
+        item.x = Phaser.Math.Between(minX, maxX);
       }
 
-      item.y = Phaser.Math.Between(-300, -50);
-      item.x = Phaser.Math.Between(minX, maxX);
-    }
+      if (
+        Phaser.Geom.Intersects.RectangleToRectangle(
+          new Phaser.Geom.Rectangle(
+            this.player.x - (isMobile ? 35 : 70),
+            this.player.y - (isMobile ? 25 : 50),
+            isMobile ? 70 : 140,
+            isMobile ? 50 : 100
+          ),
+          item.getBounds()
+        )
+      ) {
+        this.score += 1;
+        this.scoreText.setText('Score: ' + this.score);
 
-    if (
-      Phaser.Geom.Intersects.RectangleToRectangle(
-        this.player.getBounds(),
-        item.getBounds()
-      )
-    ) {
-      this.score += 1;
-      this.scoreText.setText('Score: ' + this.score);
-
-      item.y = Phaser.Math.Between(-300, -50);
-      item.x = Phaser.Math.Between(minX, maxX);
-    }
+        item.y = Phaser.Math.Between(-300, -50);
+        item.x = Phaser.Math.Between(minX, maxX);
+      }
   });
 }
 
@@ -296,7 +306,7 @@ function showGameOver() {
   });
 
   restartButton.on("pointerdown", () => {
-    this.scene.restart();
+    window.location.reload();
   });
 }
 </script>
