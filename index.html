@@ -121,11 +121,20 @@ function create() {
         'background'
     );
 
-    this.background.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+      if (isMobile) {
+        this.background.setScale(
+          Math.max(
+            GAME_WIDTH / this.background.width,
+            GAME_HEIGHT / this.background.height
+          )
+        );
+    } else {
+      this.background.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+    }
 
     this.player = this.add.sprite(
         isMobile ? GAME_WIDTH / 2 : 430,
-        isMobile ? GAME_HEIGHT - 120 : 690,
+        isMobile ? GAME_HEIGHT - 170 : 690,
         'player'
     );
 
