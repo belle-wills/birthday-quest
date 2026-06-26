@@ -100,7 +100,7 @@ function create() {
   this.playerSpeed = 20;
   this.itemSpeed = 1.8;
   this.lives = 3;
-  this.nextSpeedIncrease = 10;
+  this.nextSpeedIncrease = 5;
 
   this.background = this.add.image(835, 432.5, 'background');
   this.background.setDisplaySize(1670, 865);
@@ -164,7 +164,7 @@ function update() {
 
   if (this.score >= this.nextSpeedIncrease) {
     this.itemSpeed += 0.25;
-    this.nextSpeedIncrease += 10;
+    this.nextSpeedIncrease += 5;
     }
 
   this.items.forEach(item => {
