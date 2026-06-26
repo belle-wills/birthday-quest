@@ -25,6 +25,24 @@ It was designed as an interactive birthday card rather than a traditional game, 
 
 ## 🎮 Gameplay 🎮
 
+### Gameplay Demo
+
+![Demo](assets/birthday-quest-demo.mp4)
+
+### Opening Screen
+
+![Opening](assets/opening-screen.png)
+
+### In Game
+
+![Gameplay](assets/gameplay.png)
+
+### Game Over
+
+![Game Over](assets/game-over.png)
+
+### Instructions 
+
 - Move left and right to catch falling gifts.
 - Every gift collected increases your score.
 - Missing an item costs one life.
