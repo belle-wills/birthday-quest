@@ -58,13 +58,20 @@ document.getElementById("open-card-btn").addEventListener("click", () => {
   new Phaser.Game(config);
 });
 
+const isMobile = window.innerWidth < 768;
+
+const GAME_WIDTH = isMobile ? 390 : 1670;
+const GAME_HEIGHT = isMobile ? 844 : 865;
+
+const minX = isMobile ? 40 : 80;
+const maxX = isMobile ? GAME_WIDTH - 40 : 1590;
+const bottomY = isMobile ? GAME_HEIGHT + 60 : 900;
+
 const config = {
   type: Phaser.AUTO,
   parent: "game-container",
-  width: 1670,
-  height: 865,
-  transparent: true,
-  backgroundColor: "rgba(0,0,0,0)",
+  width: GAME_WIDTH,
+  height: GAME_HEIGHT,
 
   scale: {
     mode: Phaser.Scale.FIT,
@@ -73,16 +80,10 @@ const config = {
 
   physics: {
     default: "arcade",
-    arcade: {
-      gravity: { y: 0 }
-    }
+    arcade: { gravity: { y: 0 } }
   },
 
-  scene: {
-    preload,
-    create,
-    update
-  }
+  scene: { preload, create, update }
 };
 
 function preload() {
@@ -108,35 +109,61 @@ function create() {
     }, 300);
     });
   this.gameOver = false;
-  this.playerSpeed = 20;
-  this.itemSpeed = 1.8;
+  this.playerSpeed = isMobile ? 10 : 20;
+  this.itemSpeed = isMobile ? 2.0 : 1.8;
   this.lives = 3;
   this.nextSpeedIncrease = 5;
 
-  this.background = this.add.image(835, 432.5, 'background');
-  this.background.setDisplaySize(1670, 865);
+  this.background = this.add.image(
+        GAME_WIDTH / 2,
+        GAME_HEIGHT / 2,
+        'background'
+    );
 
-  this.player = this.add.sprite(430, 690, 'player');
-  this.player.setScale(0.65);
+    this.background.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+
+    this.player = this.add.sprite(
+        isMobile ? GAME_WIDTH / 2 : 430,
+        isMobile ? GAME_HEIGHT - 120 : 690,
+        'player'
+    );
+
+    this.player.setScale(isMobile ? 0.5 : 0.65);
 
   this.cursor = this.input.keyboard.createCursorKeys();
 
-  this.score = 0;
-  this.scoreText = this.add.text(35, 25, 'Score: 0', {
-    fontFamily: 'Georgia',
-    fontSize: '28px',
-    color: '#ffffff',
-    stroke: '#000000',
-    strokeThickness: 4
-  });
+  this.input.on("pointermove", pointer => {
+    if (isMobile && !this.gameOver) {
+        this.player.x = Phaser.Math.Clamp(pointer.x, minX, maxX);
+    }
+    });
 
-  this.livesText = this.add.text(760, 25, 'Lives: ❤️❤️❤️', {
-    fontFamily: 'Georgia',
-    fontSize: '28px',
-    color: '#ffffff',
-    stroke: '#000000',
-    strokeThickness: 4
-  });
+  this.score = 0;
+    this.scoreText = this.add.text(
+        isMobile ? 15 : 35,
+        isMobile ? 20 : 25,
+        'Score: 0',
+        {
+            fontFamily: 'Georgia',
+            fontSize: isMobile ? '22px' : '28px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4
+        }
+    );
+
+    this.livesText = this.add.text(
+        isMobile ? 210 : 760,
+        isMobile ? 20 : 25,
+        'Lives: ❤️❤️❤️',
+        {
+            fontFamily: 'Georgia',
+            fontSize: isMobile ? '22px' : '28px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4
+        }
+    );
 
   this.items = [];
 
@@ -144,11 +171,10 @@ function create() {
 
   for (let i = 0; i < 4; i++) {
     const type = itemTypes[i];
-
     const item = this.add.sprite(
-      Phaser.Math.Between(80, 1590),
-      Phaser.Math.Between(-500, -50),
-      type
+        Phaser.Math.Between(minX, maxX),
+        Phaser.Math.Between(-500, -50),
+        type
     );
 
     if (type === 'flower') item.setScale(0.10);
@@ -162,16 +188,17 @@ function create() {
   }
 }
 
+
 function update() {
   if (this.gameOver) return;
 
-  if (this.cursor.left.isDown && this.player.x > 80) {
+    if (this.cursor.left.isDown && this.player.x > minX) {
     this.player.x -= this.playerSpeed;
-  }
+    }
 
-  if (this.cursor.right.isDown && this.player.x < 1590) {
+    if (this.cursor.right.isDown && this.player.x < maxX) {
     this.player.x += this.playerSpeed;
-  }
+    }
 
   if (this.score >= this.nextSpeedIncrease) {
     this.itemSpeed += 0.25;
@@ -181,7 +208,7 @@ function update() {
   this.items.forEach(item => {
     item.y += this.itemSpeed + item.speedOffset;
 
-    if (item.y > 900) {
+    if (item.y > bottomY) {
       this.lives--;
 
       if (this.lives === 2) this.livesText.setText("Lives: ❤️❤️");
@@ -193,7 +220,7 @@ function update() {
       }
 
       item.y = Phaser.Math.Between(-300, -50);
-      item.x = Phaser.Math.Between(80, 1590);
+      item.x = Phaser.Math.Between(minX, maxX);
     }
 
     if (
@@ -206,7 +233,7 @@ function update() {
       this.scoreText.setText('Score: ' + this.score);
 
       item.y = Phaser.Math.Between(-300, -50);
-      item.x = Phaser.Math.Between(80, 1590);
+      item.x = Phaser.Math.Between(minX, maxX);
     }
   });
 }
