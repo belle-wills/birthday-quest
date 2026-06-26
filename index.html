@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mum's Birthday Quest</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div id="card-screen">
+  <div class="balloon b1">🎈</div>
+  <div class="balloon b2">🎈</div>
+  <div class="balloon b3">🎈</div>
+  <div class="balloon b4">🎈</div>
+
+  <div class="card">
+    <h1 class="birthday-title">
+      <span>🎂</span>
+      <span>Penblwydd Hapus Mum!</span>
+      <span>🎂</span>
+    </h1>
+
+    <p>Open your birthday surprise...</p>
+    <button id="open-card-btn">🎉 Open Card 🎉</button>
+  </div>
+</div>
+
+<div id="game-screen">
+  <div id="game-container"></div>
+</div>
+
+<script>
+let gameStarted = false;
+
+// Party poppers on opening page clicks
+document.addEventListener("click", (e) => {
+  if (gameStarted) return;
+
+  for (let i = 0; i < 8; i++) {
+    const pop = document.createElement("div");
+    pop.className = "party-pop";
+    pop.textContent = ["🎉", "🎊", "✨", "💖"][Math.floor(Math.random() * 4)];
+    pop.style.left = e.clientX + Phaser.Math.Between(-80, 80) + "px";
+    pop.style.top = e.clientY + Phaser.Math.Between(-80, 80) + "px";
+    document.body.appendChild(pop);
+
+    setTimeout(() => pop.remove(), 900);
+  }
+});
+
+document.getElementById("open-card-btn").addEventListener("click", () => {
+  if (gameStarted) return;
+
+  gameStarted = true;
+
+  document.getElementById("card-screen").style.display = "none";
+  document.getElementById("game-screen").style.display = "block";
+
+  new Phaser.Game(config);
+});
+
+const config = {
+  type: Phaser.AUTO,
+  parent: "game-container",
+  width: 1670,
+  height: 865,
+
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 }
+    }
+  },
+
+  scene: {
+    preload,
+    create,
+    update
+  }
+};
+
+function preload() {
+  this.load.image('player', 'character.png');
+  this.load.image('flower', 'flower.png');
+  this.load.image('leo', 'leo.png');
+  this.load.image('motorbike', 'motorbike.png');
+  this.load.image('book', 'book.png');
+  this.load.image('background', 'background.png');
+}
+
+function create() {
+  this.gameOver = false;
+  this.itemSpeed = 1;
+  this.lives = 3;
+  this.nextSpeedIncrease = 4;
+
+  this.background = this.add.image(835, 432.5, 'background');
+  this.background.setDisplaySize(1670, 865);
+
+  this.player = this.add.sprite(430, 690, 'player');
+  this.player.setScale(0.65);
+
+  this.cursor = this.input.keyboard.createCursorKeys();
+
+  this.score = 0;
+  this.scoreText = this.add.text(35, 25, 'Score: 0', {
+    fontFamily: 'Georgia',
+    fontSize: '28px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 4
+  });
+
+  this.livesText = this.add.text(760, 25, 'Lives: ❤️❤️❤️', {
+    fontFamily: 'Georgia',
+    fontSize: '28px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 4
+  });
+
+  this.items = [];
+
+  const itemTypes = ['flower', 'motorbike', 'leo', 'book'];
+
+  for (let i = 0; i < 4; i++) {
+    const type = itemTypes[i];
+
+    const item = this.add.sprite(
+      Phaser.Math.Between(80, 1590),
+      Phaser.Math.Between(-500, -50),
+      type
+    );
+
+    if (type === 'flower') item.setScale(0.10);
+    else if (type === 'motorbike') item.setScale(0.25);
+    else if (type === 'leo') item.setScale(0.25);
+    else if (type === 'book') item.setScale(0.22);
+
+    item.speedOffset = Phaser.Math.FloatBetween(0, 0.3);
+
+    this.items.push(item);
+  }
+}
+
+function update() {
+  if (this.gameOver) return;
+
+  if (this.cursor.left.isDown && this.player.x > 80) {
+    this.player.x -= 12;
+  }
+
+  if (this.cursor.right.isDown && this.player.x < 1590) {
+    this.player.x += 12;
+  }
+
+  if (this.score >= this.nextSpeedIncrease) {
+    this.itemSpeed += 0.40;
+    this.nextSpeedIncrease += 4;
+  }
+
+  this.items.forEach(item => {
+    item.y += this.itemSpeed + item.speedOffset;
+
+    if (item.y > 900) {
+      this.lives--;
+
+      if (this.lives === 2) this.livesText.setText("Lives: ❤️❤️");
+      if (this.lives === 1) this.livesText.setText("Lives: ❤️");
+
+      if (this.lives === 0) {
+        showGameOver.call(this);
+        return;
+      }
+
+      item.y = Phaser.Math.Between(-300, -50);
+      item.x = Phaser.Math.Between(80, 1590);
+    }
+
+    if (
+      Phaser.Geom.Intersects.RectangleToRectangle(
+        this.player.getBounds(),
+        item.getBounds()
+      )
+    ) {
+      this.score += 1;
+      this.scoreText.setText('Score: ' + this.score);
+
+      item.y = Phaser.Math.Between(-300, -50);
+      item.x = Phaser.Math.Between(80, 1590);
+    }
+  });
+}
+
+function showGameOver() {
+  this.livesText.setText("Lives:");
+  this.gameOver = true;
+
+  this.items.forEach(item => item.setVisible(false));
+
+  const centreX = this.cameras.main.width / 2;
+  const centreY = this.cameras.main.height / 2;
+
+  this.add.rectangle(centreX, centreY, 850, 300, 0x000000, 0.6);
+
+  this.add.text(centreX, centreY - 90, "💔 Mum missed too many presents!", {
+    fontFamily: "Georgia",
+    fontSize: "42px",
+    color: "#FFE4EC",
+    stroke: "#000000",
+    strokeThickness: 8
+  }).setOrigin(0.5);
+
+  this.add.text(centreX, centreY - 10, "Final Score: " + this.score, {
+    fontFamily: "Georgia",
+    fontSize: "34px",
+    color: "#ffffff",
+    stroke: "#000000",
+    strokeThickness: 6
+  }).setOrigin(0.5);
+
+  const restartButton = this.add.text(centreX, centreY + 90, "🎁 Start Again", {
+    fontFamily: "Georgia",
+    fontSize: "30px",
+    color: "#ffffff",
+    backgroundColor: "#6C4AB6",
+    padding: { x: 20, y: 10 },
+    stroke: "#000000",
+    strokeThickness: 4
+  })
+  .setOrigin(0.5)
+  .setInteractive({ useHandCursor: true });
+
+  restartButton.on("pointerover", () => {
+    restartButton.setStyle({ backgroundColor: "#8B6FD8" });
+  });
+
+  restartButton.on("pointerout", () => {
+    restartButton.setStyle({ backgroundColor: "#6C4AB6" });
+  });
+
+  restartButton.on("pointerdown", () => {
+    this.scene.restart();
+  });
+}
+</script>
+</body>
+</html>
