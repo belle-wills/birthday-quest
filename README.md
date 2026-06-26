@@ -27,7 +27,7 @@ It was designed as an interactive birthday card rather than a traditional game, 
 
 ### Gameplay Demo
 
-<video src="assets/birthday-quest-demo.mp4" controls width="800"></video>
+[Watch the gameplay demo](assets/birthday-quest-demo.mp4)
 
 ### Opening Screen
 
@@ -35,7 +35,7 @@ It was designed as an interactive birthday card rather than a traditional game, 
 
 ### In Game
 
-![Gameplay](assets/gameplay.png)
+![Gameplay](assets/game-play.png)
 
 ### Game Over
 
