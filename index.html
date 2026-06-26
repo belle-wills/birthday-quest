@@ -94,7 +94,10 @@ function preload() {
   this.load.image('leo', 'assets/leo.png');
   this.load.image('motorbike', 'assets/motorbike.png');
   this.load.image('book', 'assets/book.png');
-  this.load.image('background', 'assets/background.png');
+  this.load.image(
+  'background',
+  isMobile ? 'assets/mobile-background.png' : 'assets/background.png'
+);
 }
 
 function create() {
@@ -192,10 +195,10 @@ function create() {
         type
     );
 
-    if (type === 'flower') item.setScale(0.10);
-    else if (type === 'motorbike') item.setScale(0.25);
-    else if (type === 'leo') item.setScale(0.25);
-    else if (type === 'book') item.setScale(0.22);
+    if (type === 'flower') item.setScale(isMobile ? 0.07 : 0.10);
+    else if (type === 'motorbike') item.setScale(isMobile ? 0.17 : 0.25);
+    else if (type === 'leo') item.setScale(isMobile ? 0.17 : 0.25);
+    else if (type === 'book') item.setScale(isMobile ? 0.15 : 0.22);
 
     item.speedOffset = Phaser.Math.FloatBetween(0, 0.3);
 
@@ -295,6 +298,7 @@ function showGameOver() {
     strokeThickness: 4
   })
   .setOrigin(0.5)
+  .setDepth(999)
   .setInteractive({ useHandCursor: true });
 
   restartButton.on("pointerover", () => {
@@ -306,7 +310,7 @@ function showGameOver() {
   });
 
   restartButton.on("pointerdown", () => {
-    window.location.reload();
+    this.scene.restart();
   });
 }
 </script>
