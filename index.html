@@ -55,9 +55,6 @@ document.getElementById("open-card-btn").addEventListener("click", () => {
 
   gameStarted = true;
 
-  document.getElementById("card-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "block";
-
   new Phaser.Game(config);
 });
 
@@ -66,6 +63,8 @@ const config = {
   parent: "game-container",
   width: 1670,
   height: 865,
+  transparent: true,
+  backgroundColor: "rgba(0,0,0,0)",
 
   scale: {
     mode: Phaser.Scale.FIT,
@@ -96,6 +95,18 @@ function preload() {
 }
 
 function create() {
+    const cardScreen = document.getElementById("card-screen");
+    const gameScreen = document.getElementById("game-screen");
+
+    gameScreen.style.display = "block";
+
+    this.time.delayedCall(150, () => {
+    cardScreen.style.opacity = "0";
+
+    setTimeout(() => {
+        cardScreen.style.display = "none";
+    }, 300);
+    });
   this.gameOver = false;
   this.playerSpeed = 20;
   this.itemSpeed = 1.8;

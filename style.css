@@ -118,6 +118,11 @@ button:hover {
   }
 }
 
+#card-screen {
+  transition: opacity 0.3s ease;
+}
+
 #game-screen {
   display: none;
+  background: #ffe4ec;
 }
