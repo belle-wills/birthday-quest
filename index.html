@@ -76,7 +76,7 @@ const config = {
   backgroundColor: "#ffe4ec",
 
   scale: {
-    mode: Phaser.Scale.RESIZE,
+    mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
 
@@ -94,10 +94,8 @@ function preload() {
   this.load.image('leo', 'assets/leo.png');
   this.load.image('motorbike', 'assets/motorbike.png');
   this.load.image('book', 'assets/book.png');
-  this.load.image(
-  'background',
-  isMobile ? 'assets/mobile-background.png' : 'assets/background.png'
-);
+  this.load.image('backgroundDesktop', 'assets/background.png');
+  this.load.image('backgroundMobile', 'assets/background-mobile.png');
 }
 
 function create() {
@@ -120,25 +118,20 @@ function create() {
   this.lives = 3;
   this.nextSpeedIncrease = 5;
 
+    const bgKey = isMobile ? 'backgroundMobile' : 'backgroundDesktop';
+
     this.background = this.add.image(
-    isMobile ? GAME_WIDTH * 0.58 : GAME_WIDTH / 2,
-    GAME_HEIGHT / 2,
-    'background'
-  );
+        GAME_WIDTH / 2,
+        GAME_HEIGHT / 2,
+        bgKey
+    );
 
-    if (isMobile) {
-      this.background.setScale(
-        Math.max(
-          GAME_WIDTH / this.background.width,
-          GAME_HEIGHT / this.background.height
-        )
-      );
+    const scale = Math.max(
+        GAME_WIDTH / this.background.width,
+        GAME_HEIGHT / this.background.height
+    );
 
-      // Move image slightly right so the visible crop shows more left + middle
-      this.background.x = GAME_WIDTH * 0.62;
-    } else {
-      this.background.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
-    }
+    this.background.setScale(scale);
 
     this.player = this.add.sprite(
         isMobile ? GAME_WIDTH / 2 : 430,
@@ -270,7 +263,14 @@ function showGameOver() {
   const centreX = this.cameras.main.width / 2;
   const centreY = this.cameras.main.height / 2;
 
-  this.add.rectangle(centreX, centreY, 850, 300, 0x000000, 0.6);
+  this.add.rectangle(
+    centreX,
+    centreY,
+    isMobile ? GAME_WIDTH - 40 : 850,
+    isMobile ? 260 : 300,
+    0x000000,
+    0.6
+  );
 
   this.add.text(centreX, centreY - 90, "💔 Mum missed too many presents!", {
     fontFamily: "Georgia",
