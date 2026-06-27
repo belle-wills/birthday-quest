@@ -60,8 +60,8 @@ document.getElementById("open-card-btn").addEventListener("click", () => {
 
 const isMobile = window.innerWidth < 768;
 
-const GAME_WIDTH = isMobile ? 390 : 1670;
-const GAME_HEIGHT = isMobile ? 844 : 865;
+const GAME_WIDTH = isMobile ? window.innerWidth : 1670;
+const GAME_HEIGHT = isMobile ? window.innerHeight : 865;
 
 const minX = isMobile ? 40 : 80;
 const maxX = isMobile ? GAME_WIDTH - 40 : 1590;
@@ -76,7 +76,7 @@ const config = {
   backgroundColor: "#ffe4ec",
 
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
 
