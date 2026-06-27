@@ -123,22 +123,26 @@ button:hover {
 }
 
 #game-screen {
-  display: none;
-  width: 100vw;
-  height: 100vh;
-  background: #ffe4ec;
-  justify-content: center;
-  align-items: center;
+    display:none;
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+}
+
+#game-container canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 #game-container {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: #ffe4ec;
 }
 #restart-html-btn {
   display: none;
-  position: fixed;
+  position: absolute;
   left: 50%;
   top: 58%;
   transform: translate(-50%, -50%);
