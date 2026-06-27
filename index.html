@@ -29,10 +29,15 @@
 
 <div id="game-screen">
   <div id="game-container"></div>
+  <button id="restart-html-btn">🎁 Start Again</button>
 </div>
 
 <script>
 let gameStarted = false;
+
+document.getElementById("restart-html-btn").addEventListener("click", () => {
+  window.location.reload();
+});
 
 // Party poppers on opening page clicks
 document.addEventListener("click", (e) => {
@@ -284,7 +289,7 @@ function showGameOver() {
 
   this.add.text(centreX, centreY - 90, "💔 Mum missed too many presents!", {
     fontFamily: "Georgia",
-    fontSize: "42px",
+    fontSize: isMobile ? "24px" : "42px",
     color: "#FFE4EC",
     stroke: "#000000",
     strokeThickness: 8
@@ -292,36 +297,14 @@ function showGameOver() {
 
   this.add.text(centreX, centreY - 10, "Final Score: " + this.score, {
     fontFamily: "Georgia",
-    fontSize: "34px",
+    fontSize: isMobile ? "22px" : "34px",
     color: "#ffffff",
     stroke: "#000000",
     strokeThickness: 6
   }).setOrigin(0.5);
 
-  const restartButton = this.add.text(centreX, centreY + 90, "🎁 Start Again", {
-    fontFamily: "Georgia",
-    fontSize: "30px",
-    color: "#ffffff",
-    backgroundColor: "#6C4AB6",
-    padding: { x: 20, y: 10 },
-    stroke: "#000000",
-    strokeThickness: 4
-  })
-  .setOrigin(0.5)
-  .setDepth(9999)
-  .setInteractive({ useHandCursor: true });
+  document.getElementById("restart-html-btn").style.display = "block";
 
-  restartButton.on("pointerover", () => {
-    restartButton.setStyle({ backgroundColor: "#8B6FD8" });
-  });
-
-  restartButton.on("pointerout", () => {
-    restartButton.setStyle({ backgroundColor: "#6C4AB6" });
-  });
-
-  restartButton.on("pointerdown", () => {
-    window.location.reload();
-  });
 }
 </script>
 </body>
